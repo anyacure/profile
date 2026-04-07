@@ -1,0 +1,15 @@
+# Server files (not needed on GitHub Pages)
+server.py
+view.db
+SUPABASE_SETUP.md
+
+# VS Code extension files
+*.vsix
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
