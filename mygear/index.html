@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>The Laboratory | Digital Workspace</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="icon" type="image/png" href="../assets/favico/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;700;900&family=JetBrains+Mono:wght@300;500&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.2/dist/vanilla-tilt.min.js"></script>
+  <!-- Three.js Suite -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <style>
+    :root {
+      --primary: #00ff88;
+      --accent: #5e17eb;
+      --glass: rgba(255, 255, 255, 0.03);
+      --glass-thick: rgba(20, 20, 25, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
+      --neon-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      cursor: none !important;
+    }
+
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Custom Cursor */
+    #cursor {
+      width: 20px;
+      height: 20px;
+      border: 1px solid var(--primary);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s ease;
+      background: rgba(0, 255, 136, 0.1);
+    }
+
+    #video-background {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+    }
+
+    #myVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.4;
+      filter: grayscale(0.2) contrast(1.1);
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.9) 100%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 0;
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+      opacity: 0.3;
+    }
+
+    .main-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px 150px;
+      z-index: 10;
+    }
+
+    /* Top Navigation bar */
+    .nebula-nav {
+      position: sticky;
+      top: 20px;
+      width: 100%;
+      padding: 15px 25px;
+      background: var(--glass-thick);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 60px;
+      z-index: 1000;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .brand-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 2px;
+      color: var(--primary);
+    }
+
+    .back-profile {
+      text-decoration: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      transition: 0.3s;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .back-profile:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    /* RGB HEADER REBORN */
+    .hero-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    @keyframes rgb-text {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      100% {
+        background-position: 100% 50%;
+      }
+    }
+
+    .gear-page-header h1 {
+      font-size: clamp(48px, 12vw, 100px);
+      margin: 0;
+      background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgb-text 6s linear infinite;
+      letter-spacing: -4px;
+      font-weight: 900;
+      text-transform: uppercase;
+      filter: drop-shadow(0 0 15px rgba(29, 185, 84, 0.4));
+    }
+
+    .subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 6px;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-top: -10px;
+      font-weight: 300;
+      opacity: 0.8;
+    }
+
+    @keyframes gradient-anim {
+      0% {
+        background-position: 0% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    /* 3D Lab Container */
+    .lab-3d-scene {
+      position: relative;
+      width: 100%;
+      height: 700px;
+      margin: 40px 0 80px;
+    }
+
+    #webgl-canvas {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+
+    .data-overlay {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 40px;
+      transform: translateY(-50%);
+    }
+
+    .hud-stat {
+      background: var(--glass-thick);
+      padding: 20px;
+      border-radius: 20px;
+      border-left: 3px solid var(--primary);
+      backdrop-filter: blur(10px);
+    }
+
+    .hud-label {
+      font-size: 10px;
+      color: var(--primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .hud-value {
+      font-size: 20px;
+      font-weight: 900;
+      margin-top: 5px;
+    }
+
+    /* Gear Cards Reimagined */
+    .section-label {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .section-label::after {
+      content: '';
+      height: 1px;
+      flex-grow: 1;
+      background: var(--border);
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 25px;
+      width: 100%;
+      margin-bottom: 80px;
+    }
+
+    .inventory-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .inventory-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at top right, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: 0.4s;
+    }
+
+    .inventory-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 136, 0.1);
+    }
+
+    .inventory-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .card-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .product-thumb {
+      width: 100%;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .product-thumb img {
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+      transition: 0.5s;
+    }
+
+    .fallback-icon {
+      font-size: 50px;
+      color: rgba(255, 255, 255, 0.1);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
+
+    .product-thumb img[style*="display: none"]+.fallback-icon {
+      display: block;
+    }
+
+    .inventory-card:hover .product-thumb img {
+      transform: scale(1.1) rotate(2deg);
+    }
+
+    .inventory-card:hover .fallback-icon {
+      color: var(--primary);
+      opacity: 0.5;
+    }
+
+    .product-meta {
+      padding: 5px 0;
+    }
+
+    .product-category {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .product-name {
+      font-size: 18px;
+      font-weight: 900;
+      margin: 4px 0 8px;
+      color: #fff;
+    }
+
+    .product-price {
+      font-size: 14px;
+      font-weight: 700;
+      opacity: 0.6;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Floating Music Dock */
+    .liquid-dock {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 500px;
+      height: 70px;
+      background: var(--glass-thick);
+      backdrop-filter: blur(25px);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      z-index: 2000;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .dock-art {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--primary);
+      animation: rotate-slow 10s linear infinite;
+    }
+
+    @keyframes rotate-slow {
+      from {
+        transform: rotate(0);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .dock-info {
+      flex-grow: 1;
+      padding: 0 15px;
+      overflow: hidden;
+    }
+
+    .dock-title {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dock-artist {
+      font-size: 11px;
+      opacity: 0.5;
+    }
+
+    .dock-controls {
+      display: flex;
+      gap: 15px;
+      margin-right: 15px;
+    }
+
+    .dock-btn {
+      font-size: 20px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .dock-btn:hover {
+      color: var(--primary);
+      transform: scale(1.2);
+    }
+
+    /* Spec Reader Overlay */
+    #spec-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(40px);
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: 0.5s;
+    }
+
+    .reader-card {
+      background: #0d0d0d;
+      width: 100%;
+      max-width: 600px;
+      padding: 60px;
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      text-align: center;
+      position: relative;
+    }
+
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+      box-shadow: 0 0 20px var(--primary);
+      animation: scan 3s linear infinite;
+    }
+
+    @keyframes scan {
+      0% {
+        top: 0%;
+      }
+
+      100% {
+        top: 100%;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .main-wrapper {
+        padding: 20px 15px 120px;
+      }
+
+      .nebula-nav {
+        width: calc(100% - 30px);
+        top: 10px;
+        padding: 10px 20px;
+        margin-bottom: 30px;
+      }
+
+      .rgb-title {
+        font-size: 56px;
+        letter-spacing: -3px;
+      }
+
+      .subtitle {
+        font-size: 10px;
+        letter-spacing: 3px;
+      }
+
+      .lab-3d-scene {
+        height: 350px;
+        margin: 20px 0 40px;
+      }
+
+      .data-overlay {
+        display: none;
+      }
+
+      .inventory-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .inventory-card {
+        padding: 12px;
+        border-radius: 18px;
+      }
+
+      .product-thumb {
+        height: 120px;
+      }
+
+      .product-name {
+        font-size: 14px;
+      }
+
+      .product-price {
+        font-size: 11px;
+      }
+
+      .liquid-dock {
+        width: 92%;
+        bottom: 15px;
+        height: 60px;
+        padding: 0 8px;
+      }
+
+      .dock-art {
+        width: 40px;
+        height: 40px;
+      }
+
+      .dock-title {
+        font-size: 11px;
+      }
+
+      .dock-artist {
+        font-size: 9px;
+      }
+
+      .dock-controls {
+        gap: 10px;
+        margin-right: 5px;
+      }
+
+      #top-left-controls {
+        margin-right: 0;
+      }
+
+      .volume-slider-wrapper {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cursor"></div>
+
+  <div class="vignette"></div>
+  <div class="scanlines"></div>
+  <div id="video-background">
+    <video autoplay muted loop playsinline id="myVideo">
+      <source src="../assets/back/default.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="main-wrapper">
+    <nav class="nebula-nav">
+      <div class="nav-left">
+        <div id="top-left-controls" style="display: flex; align-items: center;">
+          <button id="muteBtn" class="glass-btn" style="background:none; border:none; color:#fff; cursor:pointer;"><i
+              class="fas fa-volume-up" id="muteIcon"></i></button>
+          <div class="volume-slider-wrapper" style="width: 80px; margin-left: 10px;">
+            <input type="range" id="volumeSlider" class="volume-slider-input" min="0" max="100" value="20"
+              style="width:100%;">
+          </div>
+        </div>
+      </div>
+      <div class="brand-id">LAB_PROTOCOL // V.3.6</div>
+      <div class="nav-right">
+        <a href="../" class="back-profile">Return Home</a>
+      </div>
+    </nav>
+
+    <header class="hero-section">
+      <h1 class="rgb-title">WORKSPACE</h1>
+      <div class="subtitle">My Personal Gaming Setup</div>
+    </header>
+
+    <!-- Interactive 3D Lab -->
+    <div class="lab-3d-scene">
+      <div id="webgl-canvas">
+        <div id="loading-3d"
+          style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); z-index: 10; font-family: 'JetBrains Mono'; color: var(--primary); letter-spacing: 2px;">
+          INITIALIZING_NEURAL_LINK...
+        </div>
+      </div>
+      <div class="data-overlay">
+        <div class="hud-stat tilt-element">
+          <div class="hud-label">Processor</div>
+          <div class="hud-value">RYZEN 9 9900X</div>
+        </div>
+        <div class="hud-stat tilt-element">
+          <div class="hud-label">Graphic Card</div>
+          <div class="hud-value">RTX 4070 OC</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Grid -->
+    <div class="section-label">Pc_Components</div>
+    <div class="inventory-grid">
+      <!-- Chassis -->
+      <div class="inventory-card tilt-element">
+        <div class="card-top"><span class="card-id">#001</span><i class="fa-solid fa-microchip"></i></div>
+        <div class="product-thumb">
+          <img src="../assets/img/lian_li_o11_dynamic.png" alt="O11DXL" onerror="this.style.display='none'">
+          <i class="fa-solid fa-box-open fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Chassis</div>
+          <div class="product-name">Lian Li PC-O11D</div>
+          <div class="product-price">$129.00</div>
+        </div>
+      </div>
+      <!-- CPU -->
+      <div class="inventory-card tilt-element">
+        <div class="card-top"><span class="card-id">#002</span><i class="fa-solid fa-bolt"></i></div>
+        <div class="product-thumb">
+          <img src="../assets/img/cpu_ryzen_9900x.png" alt="CPU 9900X" onerror="this.style.display='none'">
+          <i class="fa-solid fa-microchip fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Processor</div>
+          <div class="product-name">AMD Ryzen 9 9900X</div>
+          <div class="product-price">$435.28</div>
+        </div>
+      </div>
+      <!-- GPU -->
+      <div class="inventory-card tilt-element">
+        <div class="card-top"><span class="card-id">#003</span><i class="fa-solid fa-server"></i></div>
+        <div class="product-thumb">
+          <img src="../assets/img/gpu_rtx_4070_white.png" alt="GPU RTX4070" onerror="this.style.display='none'">
+          <i class="fa-solid fa-microchip fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">GPU</div>
+          <div class="product-name">ASUS Dual RTX 4070 White</div>
+          <div class="product-price">$490.00</div>
+        </div>
+      </div>
+      <!-- MB -->
+      <div class="inventory-card tilt-element">
+        <div class="card-top"><span class="card-id">#004</span><i class="fa-solid fa-hard-drive"></i></div>
+        <div class="product-thumb">
+          <img src="../assets/img/rog_strix_x870a_motherboard.png" alt="X870-A" onerror="this.style.display='none'">
+          <i class="fa-solid fa-id-card fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Motherboard</div>
+          <div class="product-name">ROG STRIX X870-A WIFI</div>
+          <div class="product-price">$249.99</div>
+        </div>
+      </div>
+      <!-- Cooler -->
+      <div class="inventory-card tilt-element">
+        <div class="card-top"><span class="card-id">#005</span><i class="fa-solid fa-snowflake"></i></div>
+        <div class="product-thumb">
+          <img src="../assets/img/rog_ryujin_iii_cooler.png" alt="Ryujin III" onerror="this.style.display='none'">
+          <i class="fa-solid fa-wind fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Cooler</div>
+          <div class="product-name">ROG Ryujin III 360 ARGB</div>
+          <div class="product-price">$399.99</div>
+        </div>
+      </div>
+      <!-- Storage -->
+      <div class="inventory-card tilt-element">
+        <div class="card-top"><span class="card-id">#006</span><i class="fa-solid fa-database"></i></div>
+        <div class="product-thumb">
+          <img src="../assets/img/wd_black_sn850x.png" alt="SN850X" onerror="this.style.display='none'">
+          <i class="fa-solid fa-hdd fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Storage</div>
+          <div class="product-name">WD Black SN850X 2TB</div>
+          <div class="product-price">$339.99</div>
+        </div>
+      </div>
+      <!-- PSU -->
+      <div class="inventory-card tilt-element">
+        <div class="card-top"><span class="card-id">#007</span><i class="fa-solid fa-plug"></i></div>
+        <div class="product-thumb">
+          <img src="../assets/img/cooler_master_v850_sfx.png" alt="V850" onerror="this.style.display='none'">
+          <i class="fa-solid fa-bolt fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Power Supply</div>
+          <div class="product-name">Cooler Master MWE 850W</div>
+          <div class="product-price">$95.09</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Highend_Gear</div>
+    <div class="inventory-grid">
+      <!-- Mouse -->
+      <div class="inventory-card tilt-element">
+        <div class="product-thumb">
+          <img src="../assets/img/razer_deathadder_v4_pro.png" alt="DeathAdder" onerror="this.style.display='none'">
+          <i class="fa-solid fa-mouse-pointer fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Mouse</div>
+          <div class="product-name">DeathAdder V4 Pro</div>
+          <div class="product-price">$169.99</div>
+        </div>
+      </div>
+      <!-- KB -->
+      <div class="inventory-card tilt-element">
+        <div class="product-thumb">
+          <img src="../assets/img/wooting_60he_v2.png" alt="Wooting" onerror="this.style.display='none'">
+          <i class="fa-solid fa-keyboard fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Keyboard</div>
+          <div class="product-name">Wooting 60HE V2 Custom</div>
+          <div class="product-price">$300.99</div>
+        </div>
+      </div>
+      <!-- Monitor -->
+      <div class="inventory-card tilt-element">
+        <div class="product-thumb">
+          <img src="../assets/img/rog_swift_monitor.png" alt="SwiftMonitor" onerror="this.style.display='none'">
+          <i class="fa-solid fa-desktop fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Display</div>
+          <div class="product-name">ROG Swift 360Hz PG27AQN</div>
+          <div class="product-price">$679.99</div>
+        </div>
+      </div>
+      <!-- Audio -->
+      <div class="inventory-card tilt-element">
+        <div class="product-thumb">
+          <img src="../assets/img/xenns_mangird_tea_pro.png" alt="Mangird" onerror="this.style.display='none'">
+          <i class="fa-solid fa-headphones fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Audio</div>
+          <div class="product-name">XENNS Mangird Tea Pro</div>
+          <div class="product-price">$359.00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liquid Music Dock -->
+  <div class="liquid-dock tilt-element">
+    <img id="gear-player-art" src="../assets/pfp/default.jpg" class="dock-art">
+    <div class="dock-info">
+      <div id="gear-player-title" class="dock-title">Stream Active</div>
+      <div id="gear-player-artist" class="dock-artist">Establishing sync...</div>
+      <div id="gear-progress-container"
+        style="width:100%; height:2px; background:rgba(255,255,255,0.1); margin-top:5px; border-radius:1px; overflow:hidden;">
+        <div id="gear-progress" style="height:100%; background:var(--primary); width:0%;"></div>
+      </div>
+    </div>
+    <div class="dock-controls">
+      <i class="fa-solid fa-play dock-btn" id="gear-play"></i>
+      <i class="fa-solid fa-forward-step dock-btn" id="gear-next"></i>
+    </div>
+  </div>
+
+  <!-- Music Bridge & Audio Engine -->
+  <div style="display:none;">
+    <audio id="myAudio" preload="auto"></audio>
+    <button id="bottom-play-btn"></button>
+    <button id="prev-btn"></button>
+    <button id="next-btn"></button>
+    <div id="bottom-title"></div>
+    <div id="spotify-artist"></div>
+    <img id="bottom-art">
+    <div id="bottom-progress"></div>
+    <div id="bottom-progress-container"></div>
+  </div>
+
+  <script src="../assets/js/tilt-effect.js"></script>
+  <script>
+    // Custom Cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    function closeSpecs() {
+      const o = document.getElementById('spec-overlay');
+      o.style.opacity = '0';
+      setTimeout(() => o.style.display = 'none', 500);
+    }
+
+    // Path Patching
+    const pt = (p, k) => {
+      const s = Object.getOwnPropertyDescriptor(p, k).set;
+      Object.defineProperty(p, k, { set: function (v) { if (typeof v === 'string' && v.startsWith('./assets/')) v = '../' + v.substring(2); s.call(this, v); } });
+    };
+    pt(HTMLImageElement.prototype, 'src'); pt(HTMLMediaElement.prototype, 'src');
+    const fO = window.fetch; window.fetch = (u, o) => { if (typeof u === 'string' && u.includes('./assets/')) u = '../' + u.substring(2); return fO(u, o); };
+  </script>
+  <script src="../assets/js/music-control.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // --- Three.js Overhaul ---
+      const canvasCont = document.getElementById('webgl-canvas');
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(40, canvasCont.clientWidth / canvasCont.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(canvasCont.clientWidth, canvasCont.clientHeight);
+      canvasCont.appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.autoRotate = true; controls.enableDamping = true; controls.autoRotateSpeed = 1.5;
+
+      // Cinematic Lighting
+      scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+      const l1 = new THREE.DirectionalLight(0x00ff88, 1); l1.position.set(5, 5, 5); scene.add(l1);
+      const l2 = new THREE.PointLight(0x5e17eb, 2, 20); l2.position.set(-5, 5, 5); scene.add(l2);
+
+      const loader = new THREE.GLTFLoader();
+      loader.load('../assets/models/1.glb', (gltf) => {
+        const model = gltf.scene;
+        const b = new THREE.Box3().setFromObject(model);
+        const s = b.getSize(new THREE.Vector3());
+        const sc = 8 / Math.max(s.x, s.y, s.z);
+        model.scale.setScalar(sc);
+        const c = b.getCenter(new THREE.Vector3());
+        model.position.set(-c.x * sc, -c.y * sc, -c.z * sc);
+        scene.add(model);
+        document.getElementById('loading-3d').style.display = 'none';
+        function anim() { requestAnimationFrame(anim); controls.update(); renderer.render(scene, camera); } anim();
+      });
+
+      camera.position.set(10, 4, 10);
+
+      // Music Sync Bar
+      const bT = document.getElementById('bottom-title'); const sA = document.getElementById('spotify-artist');
+      const bA = document.getElementById('bottom-art'); const bP = document.getElementById('bottom-progress'); const bPl = document.getElementById('bottom-play-btn');
+      const gT = document.getElementById('gear-player-title'); const gA = document.getElementById('gear-player-artist');
+      const gAr = document.getElementById('gear-player-art'); const gP = document.getElementById('gear-progress'); const gPl = document.getElementById('gear-play');
+
+      setInterval(() => {
+        if (bT.textContent) gT.textContent = bT.textContent;
+        if (sA.textContent) gA.textContent = sA.textContent;
+        if (bA.src && !bA.src.includes('default.jpg')) gAr.src = bA.src;
+        gP.style.width = bP.style.width || '0%';
+        gPl.className = bPl.classList.contains('fa-pause') ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+      }, 100);
+      gPl.onclick = () => bPl.click();
+      document.getElementById('gear-next').onclick = () => document.getElementById('next-btn').click();
+
+      // Initiate Lab Neural Music Link
+      setTimeout(() => {
+        if (typeof window.startMusicWithRandom === 'function') {
+          window.startMusicWithRandom();
+          console.log('LAB: Music initialized from playlist.json');
+        } else {
+          bPl.click();
+        }
+      }, 2000);
+    });
+  </script>
+</body>
+
+</html>
