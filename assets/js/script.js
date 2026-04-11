@@ -8,14 +8,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var terminalTextContent = [
         "User Details:",
-        "- Alias: anyacure",
+        "- Alias: HuyIzMe",
         "- Network IP: Loading...",
         "- System: Loading...",
         "",
         "Profile Metadata:",
         "- Specialization: Web Alchemist & UI Designer",
         "- Passion: Master of Anime & Gaming",
-        "- Status: Online & Living in 4K",
+        "- Status: Mentally in Anime world, physically eating ramen",
         "-------------------------------",
         "",
         "System Ready.",
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
     terminalText.style.textAlign = 'center';
 
     function getAsciiArt() {
-        return `anyacure Profile - Bio Interface
+        return `HuyIzMe Profile - Bio Interface
 -------------------------------
 
 `;
