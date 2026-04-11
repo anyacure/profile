@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Anime Recommendations</title>
+  <link rel="icon" type="image/png" href="../assets/favico/icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Global Video and Audio Background -->
+  <div class="vignette"></div>
+  <div class="scanlines"></div>
+  <div id="video-background">
+    <video autoplay muted loop playsinline id="myVideo">
+      <source src="../assets/back/default.mp4" type="video/mp4">
+    </video>
+    </div>
+
+  <div class="main-wrapper">
+    <nav class="nebula-nav">
+      <div class="nav-left">
+        <div id="top-left-controls" style="display: flex; align-items: center;">
+          <button id="muteBtn" class="glass-btn" style="background:none; border:none; color:#fff; cursor:pointer;">
+            <i class="fas fa-volume-up" id="muteIcon"></i>
+          </button>
+        </div>
+      </div>
+      <div class="brand-id">LAB_PROTOCOL // V.3.6</div>
+      <div class="nav-right">
+        <a href="../" class="back-profile">Return Home</a>
+      </div>
+    </nav>
+
+    <header class="hero-section">
+      <h1 class="rgb-title">ANIMELIST</h1>
+      <div class="subtitle">My Masterpiece Collection</div>
+    </header>
+
+    <nav class="genre-nav" id="genre-nav">
+      <!-- Navigation pills will be populated here -->
+    </nav>
+    
+    <div id="anime-sections-container">
+      <!-- Genre sections will be rendered here by script.js -->
+    </div>
+
+  </div>
+
+  <!-- Liquid Music Dock -->
+  <div class="liquid-dock tilt-element">
+    <img id="gear-player-art" src="../assets/pfp/default.jpg" class="dock-art">
+    <div class="dock-info">
+      <div id="gear-player-title" class="dock-title">Stream Active</div>
+      <div id="gear-player-artist" class="dock-artist">Establishing sync...</div>
+      <div id="gear-progress-container"
+        style="width:100%; height:2px; background:rgba(255,255,255,0.1); margin-top:5px; border-radius:1px; overflow:hidden;">
+        <div id="gear-progress" style="height:100%; background:var(--primary); width:0%;"></div>
+      </div>
+    </div>
+    <div class="dock-controls">
+      <i class="fa-solid fa-play dock-btn" id="gear-play"></i>
+      <i class="fa-solid fa-forward-step dock-btn" id="gear-next"></i>
+    </div>
+  </div>
+
+  <!-- Music Bridge & Audio Engine -->
+  <div style="display:none;">
+    <audio id="myAudio" preload="auto"></audio>
+    <button id="bottom-play-btn"></button>
+    <button id="prev-btn"></button>
+    <button id="next-btn"></button>
+    <div id="bottom-title"></div>
+    <div id="spotify-artist"></div>
+    <img id="bottom-art">
+    <div id="bottom-progress"></div>
+    <div id="bottom-progress-container"></div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
+  <script>
+    // Path Patching for subdirectories
+    const pt = (p, k) => {
+      const s = Object.getOwnPropertyDescriptor(p, k).set;
+      Object.defineProperty(p, k, { set: function (v) { if (typeof v === 'string' && v.startsWith('./assets/')) v = '../' + v.substring(2); s.call(this, v); } });
+    };
+    pt(HTMLImageElement.prototype, 'src'); pt(HTMLMediaElement.prototype, 'src');
+    const fO = window.fetch; window.fetch = (u, o) => { if (typeof u === 'string' && u.includes('./assets/')) u = '../' + u.substring(2); return fO(u, o); };
+  </script>
+  <script src="../assets/js/music-control.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const video = document.getElementById("myVideo");
+      const muteBtn = document.getElementById("muteBtn");
+      const muteIcon = document.getElementById("muteIcon");
+      const audio = document.getElementById("myAudio");
+      
+      if (muteBtn) {
+        muteBtn.addEventListener('click', () => {
+          if (audio.muted) {
+            audio.muted = false;
+            muteIcon.classList.remove('fa-volume-mute');
+            muteIcon.classList.add('fa-volume-up');
+          } else {
+            audio.muted = true;
+            muteIcon.classList.remove('fa-volume-up');
+            muteIcon.classList.add('fa-volume-mute');
+          }
+        });
+      }
+
+      // Music Sync Variables
+      const bT = document.getElementById('bottom-title'); const sA = document.getElementById('spotify-artist');
+      const bA = document.getElementById('bottom-art'); const bP = document.getElementById('bottom-progress'); const bPl = document.getElementById('bottom-play-btn');
+      const gT = document.getElementById('gear-player-title'); const gA = document.getElementById('gear-player-artist');
+      const gAr = document.getElementById('gear-player-art'); const gP = document.getElementById('gear-progress'); const gPl = document.getElementById('gear-play');
+
+      // Continuous HUD sync
+      setInterval(() => {
+        if (bT.textContent) gT.textContent = bT.textContent;
+        if (sA.textContent) gA.textContent = sA.textContent;
+        if (bA.src && !bA.src.includes('default.jpg')) gAr.src = bA.src;
+        gP.style.width = bP.style.width || '0%';
+        gPl.className = bPl.classList.contains('fa-pause') ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+      }, 100);
+      
+      gPl.onclick = () => bPl.click();
+      document.getElementById('gear-next').onclick = () => document.getElementById('next-btn').click();
+
+      // Initiate Dock Player
+      setTimeout(() => {
+        if (typeof window.startMusicWithRandom === 'function') {
+          window.startMusicWithRandom();
+          console.log('LAB: Music inherited from core.');
+        } else {
+          bPl.click();
+        }
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
