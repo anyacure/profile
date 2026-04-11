@@ -18,7 +18,63 @@
 </head>
 
 <body>
-  <div id="terminal">
+  <!-- Loading Screen (Busting Cache with Inline Styles) -->
+  <style>
+    .pre-loader-overlay {
+        background-color: transparent !important;
+        backdrop-filter: blur(10px);
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 2147483647; /* Absolute maximum z-index */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.4s ease;
+    }
+    .pre-loader-overlay .loader-logo img {
+        width: 250px;
+        height: auto;
+        margin-bottom: 25px;
+    }
+    .pre-loader-overlay .loader-progress-bg {
+        height: 6px;
+        border-radius: 10px;
+        width: 220px;
+        background: rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        position: relative;
+    }
+    .pre-loader-overlay .loader-progress-bar {
+        width: 0%;
+        height: 100%;
+        background: #00ff88;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #00ff88;
+    }
+    .pre-loader-overlay .loading-text {
+        color: rgba(255,255,255,0.6);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        margin-top: 15px;
+        letter-spacing: 2px;
+    }
+  </style>
+
+  <div class="pre-loader-overlay" id="global-preloader">
+      <div class="loader-logo">
+          <img src="https://khuyen.dvfb.us/assets/images/loader.gif" alt="Initializing...">
+      </div>
+      <div class="loader-progress-bg">
+          <div class="loader-progress-bar" id="loader-bar-fill"></div>
+      </div>
+      <div class="loading-text" id="loader-text-status">Establishing Connection...</div>
+  </div>
+
+  <div id="terminal" style="opacity: 0; pointer-events: none; transition: opacity 0.5s ease;">
     <div id="terminal-header">
       <div id="terminal-buttons">
         <div class="terminal-button" id="close-button"></div>
@@ -243,6 +299,54 @@
   <script src="./assets/js/tilt-effect.js"></script>
   <script src="./assets/js/music-control.js"></script>
   <script src="./assets/js/view-counter.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const preloader = document.getElementById('global-preloader');
+        const barFill = document.getElementById('loader-bar-fill');
+        const textStatus = document.getElementById('loader-text-status');
+        
+        let startTimestamp = null;
+        const duration = 2000; // 2 seconds strict loading time
+
+        function step(timestamp) {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = timestamp - startTimestamp;
+            const percentage = Math.min((progress / duration) * 100, 100);
+            
+            if(barFill) {
+                barFill.style.width = percentage + '%';
+            }
+            
+            if (percentage > 80 && textStatus) {
+                textStatus.innerText = "Ready...";
+            }
+
+            if (progress < duration) {
+                window.requestAnimationFrame(step);
+            } else {
+                // Done loading
+                const terminalNode = document.getElementById('terminal');
+                if (terminalNode) {
+                    terminalNode.style.pointerEvents = 'auto';
+                    window.requestAnimationFrame(() => {
+                        terminalNode.style.opacity = '1';
+                    });
+                }
+                
+                setTimeout(() => {
+                    if (preloader) {
+                        preloader.style.opacity = '0';
+                        setTimeout(() => {
+                            preloader.style.display = 'none';
+                        }, 400); // Wait for CSS transition
+                    }
+                }, 200);
+            }
+        }
+
+        window.requestAnimationFrame(step);
+    });
+  </script>
 </body>
 
 </html>

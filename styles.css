@@ -41,12 +41,14 @@ body {
   left: 50px;
   width: 600px;
   height: 500px;
-  background-color: #1e1e1e;
-  color: #ffffff;
+  background-color: rgba(20, 20, 25, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #e0e0e0;
   border-radius: 10px;
   z-index: 1000;
   border: 2px solid #4d4d4d;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 @media screen and (max-width: 600px) {
@@ -111,6 +113,7 @@ body {
   padding: 0;
   font-size: 14px;
   line-height: 1.5;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
   overflow: hidden;
   white-space: pre-line;
 }
@@ -1148,6 +1151,7 @@ body.video-normal #video-overlay {
   color: #1DB954;
   font-weight: 700;
 }
+
 
 @media screen and (max-width: 600px) {
   .setup-grid {

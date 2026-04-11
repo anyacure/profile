@@ -7,39 +7,73 @@ document.addEventListener('DOMContentLoaded', function () {
     var closeButton = document.getElementById('close-button');
 
     var terminalTextContent = [
-        "User: HuyIzMe",
-        "IP: Loading...",
-        "System: Loading...",
-        "Bio Loaded",
-        "Press Enter To Continue",
+        "User Details:",
+        "- Alias: anyacure",
+        "- Network IP: Loading...",
+        "- System: Loading...",
+        "",
+        "Profile Metadata:",
+        "- Specialization: Web Alchemist & UI Designer",
+        "- Passion: Master of Anime & Gaming",
+        "- Status: Online & Living in 4K",
+        "-------------------------------",
+        "",
+        "System Ready.",
+        "Press [Enter] to continue to full console."
     ];
     var currentIndex = 0;
+    var isTyping = true;
+    var typingTimeout;
 
     videoBackground.pause();
     audioBackground.pause();
 
     function typeWriter() {
+        if (!isTyping) return;
         var line = currentIndex === 0 ? getAsciiArt() : terminalTextContent[currentIndex - 1];
         var i = 0;
 
         function typeChar() {
+            if (!isTyping) return;
             if (i < line.length) {
                 terminalText.textContent += line.charAt(i);
                 i++;
-                setTimeout(typeChar, 50);
+                typingTimeout = setTimeout(typeChar, 15);
             } else {
                 terminalText.textContent += "\n";
                 currentIndex++;
                 if (currentIndex < terminalTextContent.length + 1) {
                     typeWriter();
                 } else {
+                    isTyping = false;
+                    terminalContainer.removeEventListener('click', skipTyping);
                     addEventListeners();
                 }
             }
         }
-
-        typeChar();
+        if (currentIndex === 0) {
+            typingTimeout = setTimeout(typeChar, 2500); // Wait for Miku loader on startup
+        } else {
+            typeChar(); // Type subsequent lines immediately
+        }
     }
+
+    function skipTyping() {
+        if (!isTyping) return;
+        isTyping = false;
+        clearTimeout(typingTimeout);
+        
+        let fullText = getAsciiArt();
+        terminalTextContent.forEach(line => {
+            fullText += line + "\n";
+        });
+        terminalText.textContent = fullText;
+        
+        addEventListeners();
+        terminalContainer.removeEventListener('click', skipTyping);
+    }
+
+    terminalContainer.addEventListener('click', skipTyping);
 
     function handleInput() {
         terminalContainer.style.display = 'none';
@@ -105,12 +139,12 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             var ipAddress = data.ip;
-            terminalTextContent[1] = "IP: " + ipAddress;
+            terminalTextContent[2] = "- Network IP: " + ipAddress;
             typeWriter();
         })
         .catch(error => {
             console.error('Error fetching IP address:', error);
-            terminalTextContent[1] = "IP: Unable to fetch IP address";
+            terminalTextContent[2] = "- Network IP: Unable to fetch";
             typeWriter();
         });
 
@@ -190,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     var operatingSystem = getOperatingSystem();
-    terminalTextContent[2] = "System: " + operatingSystem;
+    terminalTextContent[3] = "- System: " + operatingSystem;
 
     function centerTerminal() {
         var terminalWidth = terminalContainer.offsetWidth;
@@ -209,13 +243,10 @@ document.addEventListener('DOMContentLoaded', function () {
     terminalText.style.textAlign = 'center';
 
     function getAsciiArt() {
-        return `  
+        return `anyacure Profile - Bio Interface
+-------------------------------
 
-
-
-
-      welcome to my bio
-  `;
+`;
     }
 
     var audio = document.getElementById("myAudio");
