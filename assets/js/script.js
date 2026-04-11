@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', function () {
         "",
         "Profile Metadata:",
         "- Specialization: Web Alchemist & UI Designer",
-        "- Passion: Master of Anime & Gaming",
-        "- Status: Mentally in Anime world, physically eating ramen",
+        "- Passion: Anime & Gaming",
+        "- Status: Curently missing her ",
         "-------------------------------",
         "",
         "System Ready.",
@@ -62,13 +62,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!isTyping) return;
         isTyping = false;
         clearTimeout(typingTimeout);
-        
+
         let fullText = getAsciiArt();
         terminalTextContent.forEach(line => {
             fullText += line + "\n";
         });
         terminalText.textContent = fullText;
-        
+
         addEventListeners();
         terminalContainer.removeEventListener('click', skipTyping);
     }
