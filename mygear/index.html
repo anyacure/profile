@@ -869,6 +869,8 @@
   <script src="../assets/js/music-control.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      const audio = document.getElementById('myAudio');
+      if (audio) audio.volume = 0.1;
       // --- Three.js Overhaul ---
       const canvasCont = document.getElementById('webgl-canvas');
       const scene = new THREE.Scene();
