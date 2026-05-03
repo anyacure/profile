@@ -527,15 +527,19 @@
       }
 
       .nebula-nav {
-        width: calc(100% - 30px);
+        width: calc(100% - 20px);
         top: 10px;
-        padding: 10px 20px;
+        padding: 10px 15px;
         margin-bottom: 30px;
       }
 
+      .brand-id {
+        display: none;
+      }
+
       .rgb-title {
-        font-size: 56px;
-        letter-spacing: -3px;
+        font-size: 40px;
+        letter-spacing: -2px;
       }
 
       .subtitle {
@@ -550,6 +554,14 @@
 
       .data-overlay {
         display: none;
+      }
+
+      .total-value-container {
+        bottom: 10px !important;
+        transform: translateX(-50%) scale(0.75) !important;
+        width: 100%;
+        display: flex;
+        justify-content: center;
       }
 
       .inventory-grid {
@@ -662,7 +674,7 @@
           <div class="hud-value">PNY RTX 5080 OC</div>
         </div>
       </div>
-      <div
+      <div class="total-value-container"
         style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); pointer-events: none; z-index: 20;">
         <div class="hud-stat tilt-element"
           style="border-left-color: #ff0055; text-align: center; padding: 15px 40px; background: rgba(20, 20, 25, 0.8);">
