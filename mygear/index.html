@@ -659,7 +659,15 @@
         </div>
         <div class="hud-stat tilt-element">
           <div class="hud-label">Graphic Card</div>
-          <div class="hud-value">RTX 4070 OC</div>
+          <div class="hud-value">PNY RTX 5080 OC</div>
+        </div>
+      </div>
+      <div
+        style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); pointer-events: none; z-index: 20;">
+        <div class="hud-stat tilt-element"
+          style="border-left-color: #ff0055; text-align: center; padding: 15px 40px; background: rgba(20, 20, 25, 0.8);">
+          <div class="hud-label" style="font-size: 12px;">Total Gear Value</div>
+          <div class="hud-value" id="total-gear-value" style="font-size: 32px;">$0.00</div>
         </div>
       </div>
     </div>
@@ -697,13 +705,13 @@
       <div class="inventory-card tilt-element">
         <div class="card-top"><span class="card-id">#003</span><i class="fa-solid fa-server"></i></div>
         <div class="product-thumb">
-          <img src="../assets/img/gpu_rtx_4070_white.png" alt="GPU RTX4070" onerror="this.style.display='none'">
+          <img src="../assets/img/gpu_rtx_5080_pny_oc.png" alt="GPU PNY RTX5080 OC" onerror="this.style.display='none'">
           <i class="fa-solid fa-microchip fallback-icon"></i>
         </div>
         <div class="product-meta">
           <div class="product-category">GPU</div>
-          <div class="product-name">ASUS Dual RTX 4070 White</div>
-          <div class="product-price">$490.00</div>
+          <div class="product-name">PNY RTX 5080 OC</div>
+          <div class="product-price">$1300.00</div>
         </div>
       </div>
       <!-- MB -->
@@ -749,13 +757,26 @@
       <div class="inventory-card tilt-element">
         <div class="card-top"><span class="card-id">#007</span><i class="fa-solid fa-plug"></i></div>
         <div class="product-thumb">
-          <img src="../assets/img/cooler_master_v850_sfx.png" alt="V850" onerror="this.style.display='none'">
+          <img src="../assets/img/msi_850w_psu.png" alt="MSI 850W" onerror="this.style.display='none'">
           <i class="fa-solid fa-bolt fallback-icon"></i>
         </div>
         <div class="product-meta">
           <div class="product-category">Power Supply</div>
-          <div class="product-name">Cooler Master MWE 850W</div>
-          <div class="product-price">$95.09</div>
+          <div class="product-name">MSI 850W PSU</div>
+          <div class="product-price">$113.00</div>
+        </div>
+      </div>
+      <!-- RAM -->
+      <div class="inventory-card tilt-element">
+        <div class="card-top"><span class="card-id">#008</span><i class="fa-solid fa-memory"></i></div>
+        <div class="product-thumb">
+          <img src="../assets/img/ram_tforce_ddr5.png" alt="T-Force RAM" onerror="this.style.display='none'">
+          <i class="fa-solid fa-memory fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Memory</div>
+          <div class="product-name">T-Force 32GB DDR5 6000</div>
+          <div class="product-price">$109.99</div>
         </div>
       </div>
     </div>
@@ -808,6 +829,70 @@
           <div class="product-category">Audio</div>
           <div class="product-name">XENNS Mangird Tea Pro</div>
           <div class="product-price">$359.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Everyday_gear</div>
+    <div class="inventory-grid">
+      <!-- iPhone -->
+      <div class="inventory-card tilt-element">
+        <div class="product-thumb">
+          <img src="../assets/img/iphone_16_pro_max.png" alt="iPhone 16 Pro Max" onerror="this.style.display='none'">
+          <i class="fa-solid fa-mobile-screen-button fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Smartphone</div>
+          <div class="product-name">iPhone 16 Pro Max</div>
+          <div class="product-price">$1199.00</div>
+        </div>
+      </div>
+      <!-- iPad -->
+      <div class="inventory-card tilt-element">
+        <div class="product-thumb">
+          <img src="../assets/img/ipad_pro_13_m5.png" alt="iPad Pro" onerror="this.style.display='none'">
+          <i class="fa-solid fa-tablet-screen-button fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Tablet</div>
+          <div class="product-name">iPad Pro 13" M5 1TB</div>
+          <div class="product-price">$1899.00</div>
+        </div>
+      </div>
+      <!-- Steam Deck -->
+      <div class="inventory-card tilt-element">
+        <div class="product-thumb">
+          <img src="../assets/img/steam_deck_oled.png" alt="Steam Deck" onerror="this.style.display='none'">
+          <i class="fa-solid fa-gamepad fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Handheld</div>
+          <div class="product-name">Steam Deck OLED</div>
+          <div class="product-price">$549.00</div>
+        </div>
+      </div>
+      <!-- Meta Quest 3 -->
+      <div class="inventory-card tilt-element">
+        <div class="product-thumb">
+          <img src="../assets/img/meta_quest_3.png" alt="Meta Quest 3" onerror="this.style.display='none'">
+          <i class="fa-solid fa-vr-cardboard fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">VR Headset</div>
+          <div class="product-name">Meta Quest 3</div>
+          <div class="product-price">$499.00</div>
+        </div>
+      </div>
+      <!-- Galaxy Tab S10 Ultra -->
+      <div class="inventory-card tilt-element">
+        <div class="product-thumb">
+          <img src="../assets/img/galaxy_tab_s10_ultra.png" alt="Galaxy Tab" onerror="this.style.display='none'">
+          <i class="fa-solid fa-tablet fallback-icon"></i>
+        </div>
+        <div class="product-meta">
+          <div class="product-category">Tablet</div>
+          <div class="product-name">Galaxy Tab S10 Ultra</div>
+          <div class="product-price">$1199.00</div>
         </div>
       </div>
     </div>
@@ -929,6 +1014,27 @@
           bPl.click();
         }
       }, 2000);
+
+      // Calculate Total Gear Value
+      let totalValue = 0;
+      document.querySelectorAll('.product-price').forEach(el => {
+        const price = parseFloat(el.textContent.replace(/[^0-9.-]+/g, ""));
+        if (!isNaN(price)) totalValue += price;
+      });
+      const totalEl = document.getElementById('total-gear-value');
+      if (totalEl) {
+        let start = 0;
+        const duration = 1500;
+        const step = totalValue / (duration / 16);
+        const counter = setInterval(() => {
+          start += step;
+          if (start >= totalValue) {
+            start = totalValue;
+            clearInterval(counter);
+          }
+          totalEl.textContent = '$' + start.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }, 16);
+      }
     });
   </script>
 </body>
